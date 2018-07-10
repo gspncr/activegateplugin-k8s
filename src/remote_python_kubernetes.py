@@ -45,7 +45,7 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
 
     def query(self, **kwargs):
         try:
-            print("--- Begin execution ---")
+            self.log("--- Begin execution ---", "info")
 
             start_time = time.time()
 
@@ -58,10 +58,10 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
 
             end_time = time.time()
 
-            print("--- Statistics ---")
-            print("--- Execution time: %s seconds ---" % (end_time - start_time))
+            self.log("--- Statistics ---", "info")
+            self.log("--- Execution time: %s seconds ---" % (end_time - start_time), "info")
         except Exception as exc:
-            print("Exception: " + str(exc))
+            self.log("Exception: " + str(exc), "error")
 
         return
 
@@ -104,18 +104,14 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         return
 
     def report_topology_group(self, id, name):
-        if self.args['debug']:
-            print("Create topology group: " + str(id) + " " + str(name))
-            return name
+        self.log("Create topology group: " + str(id) + " " + str(name), "info")
 
         topology_group = self.topology_builder.create_group(id, name)
 
         return topology_group
 
     def report_topology_element(self, group, id, name):
-        if self.args['debug']:
-            print("Create topology +-- element: " + " " + str(group) + " " + str(id) + " " + str(name))
-            return name
+        self.log("Create topology +-- element: " + " " + str(group) + " " + str(id) + " " + str(name), "info")
 
         topology_element = group.create_element(id, name)
 
@@ -128,9 +124,7 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         return
 
     def report_topology_metric(self, element, metric):
-        if self.args['debug']:
-            print("Create topology +---- metric: " + " " + str(metric))
-            return
+        self.log("Create topology +---- metric: " + " " + str(metric), "info")
 
         if metric['relative']:
             element.relative(key=metric['key'], value=metric['value'], dimensions=metric['dimensions'])
@@ -245,7 +239,6 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         try:
             node['node_role'] = json_data['metadata']['labels']['kubernetes.io/role']
         except Exception as exc:
-            print("Exception: " + str(exc))
             node['node_role'] = "node"
 
         node['node_instance_type'] = json_data['metadata']['labels']['beta.kubernetes.io/instance-type']
@@ -316,7 +309,6 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         try:
             pod['pod_node_name'] = json_data['spec']['nodeName']
         except Exception as exc:
-            print("Exception: " + str(exc))
             pod['pod_node_name'] = None
 
         pod['pod_metrics_endpoint'] = str(self.args['url']) + json_data['metadata']['selfLink'] + str('/proxy/metrics')
@@ -356,16 +348,14 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
                         result['dimensions'] = dimensions
 
                         results.append(result)
-
         except Exception as exc:
-            print("Exception: " + str(exc))
+            self.log("Exception: " + str(exc), "error")
             results = []
 
         return results
 
     def query_url(self, url):
-        if self.args['debug']:
-            print(url)
+        self.log("Querying url: " + url, "info")
 
         content = None
 
@@ -377,12 +367,11 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
                 r = requests.get(url, verify=False, headers={"Authorization": "Bearer " + self.args['token']}, timeout=2)
                 content = r.content.decode('UTF-8')
 
-                if self.args['debug']:
-                    print(content)
+                self.log(content, "info")
 
                 return content
             except Exception as exc:
-                print("Exception: " + str(exc))
+                self.log("Exception: " + str(exc), "info")
                 continue
 
         return content
@@ -427,19 +416,29 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
 
         return dimensions
 
+    def log(self, msg, type):
+        if self.args['debug']:
+            print(msg)
+        else:
+            if type == "info":
+                logger.info(msg)
+            if type == "error":
+                logger.error(msg)
+
+        return
+
 
 #class Test:
 #    @staticmethod
 #    def test1():
-#        id = "k8s_1"
-#        url = "https://api.k8s.dev.dynatracelabs.com"
-#        token = "[BEARER TOKEN]"
-#        file = open("plugin.json")
-#        json_config = json.load(file)
+#        id = "cluster-1"
+#        url = "https://123.456.789.012"
+#        token = "eyJhbGciOiJxxzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkeW5hdHJhY2UtdG9rZW4tc3Y3ZzkiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZHluYXRyYWNlIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiN2I4MDhjMzctODQyZC0xMWU4LTg5ZWQtNDIwMTBhODAwMTg3Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmR5bmF0cmFjZSJ9.Nx727fSk9PILIFHxl2qxzmeNzZZ9Pv9tPQFhaAQdZ6zGm4XK7Zc8Pd-mlSZAAdztVkIicEgE7aRKrQGq4KWWUo2pFqNpKwp3y-PClOoq7dHG1BnzQbWU9yTZ0sfHAlt83vUVl7-QUadhLvRWXG4IJHl_UNnf7oNiHlLGS52RKgp07EXViIV-9d6y6P_Vjo3YsRGMpZuWQg0VXSgm7NMr23SDTLUHJLbZWFxIxBgFVa6rnUpmKem33fSJ5PtTNLdG_qI8gwXODYpHqg2lWkhQkgMsG2GeF3ETfQyl1vxU7pIX3gYELIc5-wGcPA0oHAe9FnBUpo2IO8QMebqliBmPwA"
+#        json_config = json.load(open("plugin.json"))
 #        plugin = RemoteKubernetesPlugin()
 #        plugin.initialize(config={"id": id, "url": url, "token": token}, json_config=json_config, debug=True)
 #        plugin.query()
-#
-#
+
+
 #if __name__ == "__main__":
 #    Test.test1()
