@@ -247,19 +247,70 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         except Exception as exc:
             node['node_role'] = "node"
 
-        node['node_instance_type'] = json_data['metadata']['labels']['beta.kubernetes.io/instance-type']
-        node['node_hostname'] = json_data['metadata']['labels']['kubernetes.io/hostname']
-        node['node_creation_timestamp'] = json_data['metadata']['creationTimestamp']
-        node['node_info_machine_id'] = json_data['status']['nodeInfo']['machineID']
-        node['node_info_system_uuid'] = json_data['status']['nodeInfo']['systemUUID']
-        node['node_info_boot_id'] = json_data['status']['nodeInfo']['bootID']
-        node['node_info_kernel_version'] = json_data['status']['nodeInfo']['kernelVersion']
-        node['node_info_os_image'] = json_data['status']['nodeInfo']['osImage']
-        node['node_info_container_runtime_version'] = json_data['status']['nodeInfo']['containerRuntimeVersion']
-        node['node_info_kubelet_version'] = json_data['status']['nodeInfo']['kubeletVersion']
-        node['node_info_kube_proxy_version'] = json_data['status']['nodeInfo']['kubeProxyVersion']
-        node['node_info_operating_system'] = json_data['status']['nodeInfo']['operatingSystem']
-        node['node_info_architecture'] = json_data['status']['nodeInfo']['architecture']
+        try:
+            node['node_instance_type'] = json_data['metadata']['labels']['beta.kubernetes.io/instance-type']
+        except Exception as exc:
+            node['node_instance_type'] = None
+
+        try:
+            node['node_hostname'] = json_data['metadata']['labels']['kubernetes.io/hostname']
+        except Exception as exc:
+            node['node_hostname'] = None
+
+        try:
+            node['node_creation_timestamp'] = json_data['metadata']['creationTimestamp']
+        except Exception as exc:
+            node['node_creation_timestamp'] = None
+
+        try:
+            node['node_info_machine_id'] = json_data['status']['nodeInfo']['machineID']
+        except Exception as exc:
+            node['node_info_machine_id'] = None
+
+        try:
+            node['node_info_system_uuid'] = json_data['status']['nodeInfo']['systemUUID']
+        except Exception as exc:
+            node['node_info_system_uuid'] = None
+
+        try:
+            node['node_info_boot_id'] = json_data['status']['nodeInfo']['bootID']
+        except Exception as exc:
+            node['node_info_boot_id'] = None
+
+        try:
+            node['node_info_kernel_version'] = json_data['status']['nodeInfo']['kernelVersion']
+        except Exception as exc:
+            node['node_info_kernel_version'] = None
+
+        try:
+            node['node_info_os_image'] = json_data['status']['nodeInfo']['osImage']
+        except Exception as exc:
+            node['node_info_os_image'] = None
+
+        try:
+            node['node_info_container_runtime_version'] = json_data['status']['nodeInfo']['containerRuntimeVersion']
+        except Exception as exc:
+            node['node_info_container_runtime_version'] = None
+
+        try:
+            node['node_info_kubelet_version'] = json_data['status']['nodeInfo']['kubeletVersion']
+        except Exception as exc:
+            node['node_info_kubelet_version'] = None
+
+        try:
+            node['node_info_kube_proxy_version'] = json_data['status']['nodeInfo']['kubeProxyVersion']
+        except Exception as exc:
+            node['node_info_kube_proxy_version'] = None
+
+        try:
+            node['node_info_operating_system'] = json_data['status']['nodeInfo']['operatingSystem']
+        except Exception as exc:
+            node['node_info_operating_system'] = None
+
+        try:
+            node['node_info_architecture'] = json_data['status']['nodeInfo']['architecture']
+        except Exception as exc:
+            node['node_info_architecture'] = None
 
         return node
 
