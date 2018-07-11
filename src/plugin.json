@@ -470,6 +470,10 @@
     {
       "key": "token",
       "type": "String"
+    },
+    {
+      "key": "debug",
+      "type": "String"
     }
   ],
   "configUI" :{
@@ -477,7 +481,8 @@
 	"properties" : [
 	  { "key" : "id", "displayName": "ID", "displayOrder": 1, "displayHint": "k8s" },
 	  { "key" : "url", "displayName": "URL", "displayOrder": 2, "displayHint": "https://api.k8s.dev.dynatracelabs.com:443" },
-	  { "key" : "token", "displayName": "Bearer Token", "displayOrder": 3, "displayHint": "Token" }
+	  { "key" : "token", "displayName": "Bearer Token", "displayOrder": 3, "displayHint": "Token" },
+	  { "key" : "debug", "displayName": "Debug", "displayOrder": 4, "displayHint": "true/false" }
 	]
   }
 }

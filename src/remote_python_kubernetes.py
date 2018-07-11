@@ -21,12 +21,9 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         self.args['id'] = kwargs['config']['id']
         self.args['url'] = kwargs['config']['url']
         self.args['token'] = kwargs['config']['token']
+        self.args['debug'] = kwargs['config']['debug']
+        self.args['sandbox'] = kwargs['config']['sandbox']
         self.args['metrics'] = self.initialize_metrics(kwargs['json_config']['metrics'])
-
-        if 'debug' in kwargs:
-            self.args['debug'] = True
-        else:
-            self.args['debug'] = False
 
         return
 
@@ -73,7 +70,7 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         for node in data["nodes"]:
             element = self.report_topology_element(group, node['node_id'], node['node_name'] + str(" (") + str(node['node_role']) + str(")"))
 
-            if not self.args['debug']:
+            if self.args['sandbox'] == "false":
                 element.report_property('node_instance_type', node['node_instance_type'])
                 element.report_property('node_hostname', node['node_hostname'])
                 element.report_property('node_creation_timestamp', node['node_creation_timestamp'])
@@ -106,16 +103,20 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
     def report_topology_group(self, id, name):
         self.log("Create topology group: " + str(id) + " " + str(name), "info")
 
-        topology_group = self.topology_builder.create_group(id, name)
+        if self.args['sandbox'] == "false":
+            topology_group = self.topology_builder.create_group(id, name)
+            return topology_group
 
-        return topology_group
+        return
 
     def report_topology_element(self, group, id, name):
         self.log("Create topology +-- element: " + " " + str(group) + " " + str(id) + " " + str(name), "info")
 
-        topology_element = group.create_element(id, name)
+        if self.args['sandbox'] == "false":
+            topology_element = group.create_element(id, name)
+            return topology_element
 
-        return topology_element
+        return
 
     def report_topology_metrics(self, element, metrics):
         for metric in metrics:
@@ -126,10 +127,11 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
     def report_topology_metric(self, element, metric):
         self.log("Create topology +---- metric: " + " " + str(metric), "info")
 
-        if metric['relative']:
-            element.relative(key=metric['key'], value=metric['value'], dimensions=metric['dimensions'])
-        else:
-            element.absolute(key=metric['key'], value=metric['value'], dimensions=metric['dimensions'])
+        if self.args['sandbox'] == "false":
+            if metric['relative']:
+                element.relative(key=metric['key'], value=metric['value'], dimensions=metric['dimensions'])
+            else:
+                element.absolute(key=metric['key'], value=metric['value'], dimensions=metric['dimensions'])
 
         return
 
@@ -418,12 +420,16 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
 
     def log(self, msg, type):
         if self.args['debug']:
-            print(msg)
-        else:
             if type == "info":
                 logger.info(msg)
             if type == "error":
                 logger.error(msg)
+
+        if self.args['sandbox']:
+            if type == "info":
+                print(msg)
+            if type == "error":
+                print(msg)
 
         return
 
@@ -432,13 +438,13 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
 #    @staticmethod
 #    def test1():
 #        id = "cluster-1"
-#        url = "https://123.456.789.012"
-#        token = "eyJhbGciOiJxxzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkeW5hdHJhY2UtdG9rZW4tc3Y3ZzkiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZHluYXRyYWNlIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiN2I4MDhjMzctODQyZC0xMWU4LTg5ZWQtNDIwMTBhODAwMTg3Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmR5bmF0cmFjZSJ9.Nx727fSk9PILIFHxl2qxzmeNzZZ9Pv9tPQFhaAQdZ6zGm4XK7Zc8Pd-mlSZAAdztVkIicEgE7aRKrQGq4KWWUo2pFqNpKwp3y-PClOoq7dHG1BnzQbWU9yTZ0sfHAlt83vUVl7-QUadhLvRWXG4IJHl_UNnf7oNiHlLGS52RKgp07EXViIV-9d6y6P_Vjo3YsRGMpZuWQg0VXSgm7NMr23SDTLUHJLbZWFxIxBgFVa6rnUpmKem33fSJ5PtTNLdG_qI8gwXODYpHqg2lWkhQkgMsG2GeF3ETfQyl1vxU7pIX3gYELIc5-wGcPA0oHAe9FnBUpo2IO8QMebqliBmPwA"
+#        url = "https://146.148.122.43"
+#        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkeW5hdHJhY2UtdG9rZW4tNGdnZGwiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZHluYXRyYWNlIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiY2VmZDBjZmYtODRkMi0xMWU4LTgxZDctNDIwMTBhODQwMTFmIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmR5bmF0cmFjZSJ9.McOyv8BXgcc6cZdFMQyFAdJ8nD_uOl07dIuAzcxZYv1Hl19wnGQv0N1p_5tddUoma7WIKyB2tBt3ZU62mjaeSbYVt7PbuUQ8zwqQsNMbk97k3udyqKH0JEH60eRCekShGVTP_O8IVaAWsuk5JdtyZQz4VNk-_y7i4QvdvSE28QJusJ6fNl9nwg5S3Jz9PjmgJ3RuwfdPG96rQdIXsZdiNEzJ-9R4qzJ-Nx1nU3i3zx9Djw-aKGzWA957W4YmO-Z-qMuCHFUB-hzYAmmKodszQQ7P5aQUa22RGgPaK00cifUry6XTBK5cG98FosmflnHMHjCB285icMFUuQPC59BHCg"
 #        json_config = json.load(open("plugin.json"))
 #        plugin = RemoteKubernetesPlugin()
-#        plugin.initialize(config={"id": id, "url": url, "token": token}, json_config=json_config, debug=True)
+#        plugin.initialize(config={"id": id, "url": url, "token": token, "debug": "true", "sandbox": "true"}, json_config=json_config)
 #        plugin.query()
-
-
+#
+#
 #if __name__ == "__main__":
 #    Test.test1()
