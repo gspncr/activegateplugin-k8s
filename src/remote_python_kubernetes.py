@@ -22,8 +22,10 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         self.args['url'] = kwargs['config']['url']
         self.args['token'] = kwargs['config']['token']
         self.args['debug'] = kwargs['config']['debug']
-        self.args['sandbox'] = kwargs['config']['sandbox']
         self.args['metrics'] = self.initialize_metrics(kwargs['json_config']['metrics'])
+
+        if 'sandbox' in kwargs:
+            self.args['sandbox'] = kwargs['config']['sandbox']
 
         return
 
