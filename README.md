@@ -162,6 +162,7 @@ __1.4.4 Configure plugin:__
 - ID: [ID]
 - URL: [URL]
 - Bearer Token: [TOKEN]
+- Debug: [DEBUG]
 ```  
 
 Example values:
@@ -171,6 +172,7 @@ ENDPOINT=Endpoint1 (custom name)
 ID=k8s_cluster_1 (custom name)
 URL=https://example.com:8080 (URL to the Kubernetes API-Server)
 TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybwV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJteW5hdHJhY2UtdG9rZW4teGp0ODIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpYxUtYWNjb3VudC5uYW1lIjoiZHluYXRyYWNlIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNzg0ZWUzMDgtMzk3MS0xMWU4LWI0NzYtMxIzN2M4OWFkYzA4Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmR5bmF0cmFjZSJ9.XEsjaIAR2nAKJL-UpRdkzAOwfBzDqX3O9VpMZ1Tq7FPLZ4Fp-cQEAYezT-MYNN-USpPSAF20fjPYxVqI_-u2Ey7fuJsg_dLTISN7znSbPwfRTJxyH2zaOjmNQiM5zP08XV2G8gcn0mNs5ae7SRSeU1JGH9GGdnFQ_y7R5IL4HtnZv_KKT1cCWbwV1bGJNfYlBfyQGnmsHyBrjJMuaNtFpGzQvgekMAoWaDaFCNdHxNgYj5cymjoz1faSkC9RxUmpnR27yFEb_1eZ-u3Csb8yke6o6vSqMW3YY7HxGJAo-BK-utS_fIMs6XOPkq0pHx5TremXB7GyNt6KhGAaXW4t6A (Bearer Token)
+DEBUG=true/false (advanced logging enabled/disabled)
 ```
 
 Done!
