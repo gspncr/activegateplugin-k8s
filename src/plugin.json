@@ -1,6 +1,6 @@
 {
   "name": "custom.remote.python.kubernetes",
-  "version": "1.4",
+  "version": "1.5",
   "requiredAgentVersion": "1.101.0",
   "type": "python",
   "entity": "CUSTOM_DEVICE",

@@ -26,6 +26,8 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
 
         if 'sandbox' in kwargs:
             self.args['sandbox'] = kwargs['config']['sandbox']
+        else:
+            self.args['sandbox'] = "false"
 
         return
 
@@ -421,13 +423,13 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         return dimensions
 
     def log(self, msg, type):
-        if self.args['debug']:
+        if self.args['debug'] == "true":
             if type == "info":
                 logger.info(msg)
             if type == "error":
                 logger.error(msg)
 
-        if self.args['sandbox']:
+        if self.args['sandbox'] == "true":
             if type == "info":
                 print(msg)
             if type == "error":
