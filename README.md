@@ -263,18 +263,17 @@ $ gcloud info | grep Account
 Account: [EMAIL]
 ```
 
-Grant cluster-admin to your current identity
+Set environment variable:
 
 ```
-$ kubectl create clusterrolebinding [NAME]-cluster-admin-binding --clusterrole=cluster-admin --user=[EMAIL]
-Clusterrolebinding "[NAME]-cluster-admin-binding" created
+EMAIL=dominik.sachsenhofer@dynatrace.com
 ```
 
-Example values:
+Grant cluster-admin to your current identity:
 
 ```
-[NAME]=dominik
-[EMAIL]=dominik.sachsenhofer@dynatrace.com
+$ kubectl create clusterrolebinding dynatrace-cluster-admin-binding --clusterrole=cluster-admin --user=$EMAIL
+Clusterrolebinding "dynatrace-cluster-admin-binding" created
 ```
 
 ## Limitations
