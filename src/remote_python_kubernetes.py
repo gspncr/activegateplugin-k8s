@@ -72,7 +72,7 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
         reported_group_metrics = []
 
         for node in data["nodes"]:
-            element = self.report_topology_element(group, node['node_id'], node['node_name'] + str(" (") + str(node['node_role']) + str(")"))
+            element = self.report_topology_element(group, node['node_id'], node['node_name'] + str(" (") + str(node['node_role']) + str(")"), node['node_external_ip'])
 
             if self.args['sandbox'] == "false":
                 element.report_property('node_instance_type', node['node_instance_type'])
@@ -113,11 +113,13 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
 
         return
 
-    def report_topology_element(self, group, id, name):
-        self.log("Create topology +-- element: " + " " + str(group) + " " + str(id) + " " + str(name), "info")
+    def report_topology_element(self, group, id, name, external_ip):
+        self.log("Create topology +-- element: " + " " + str(group) + " " + str(id) + " " + str(name) + " " + str(external_ip), "info")
 
         if self.args['sandbox'] == "false":
             topology_element = group.create_element(id, name)
+            topology_element.add_endpoint(external_ip, 80)
+
             return topology_element
 
         return
@@ -241,6 +243,12 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
 
         node['node_id'] = json_data['metadata']['uid']
         node['node_name'] = json_data['metadata']['name']
+
+        for address in json_data['status']['addresses']:
+            node['node_external_ip'] = address['address']
+
+            if address['type'] == "ExternalIP":
+                break
 
         try:
             node['node_role'] = json_data['metadata']['labels']['kubernetes.io/role']
@@ -493,8 +501,8 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
 #    @staticmethod
 #    def test1():
 #        id = "cluster-1"
-#        url = "https://146.148.122.43"
-#        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkeW5hdHJhY2UtdG9rZW4tNGdnZGwiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZHluYXRyYWNlIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiY2VmZDBjZmYtODRkMi0xMWU4LTgxZDctNDIwMTBhODQwMTFmIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmR5bmF0cmFjZSJ9.McOyv8BXgcc6cZdFMQyFAdJ8nD_uOl07dIuAzcxZYv1Hl19wnGQv0N1p_5tddUoma7WIKyB2tBt3ZU62mjaeSbYVt7PbuUQ8zwqQsNMbk97k3udyqKH0JEH60eRCekShGVTP_O8IVaAWsuk5JdtyZQz4VNk-_y7i4QvdvSE28QJusJ6fNl9nwg5S3Jz9PjmgJ3RuwfdPG96rQdIXsZdiNEzJ-9R4qzJ-Nx1nU3i3zx9Djw-aKGzWA957W4YmO-Z-qMuCHFUB-hzYAmmKodszQQ7P5aQUa22RGgPaK00cifUry6XTBK5cG98FosmflnHMHjCB285icMFUuQPC59BHCg"
+#        url = "https://104.198.78.240"
+#        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkeW5hdHJhY2UtdG9rZW4tdG10eGwiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZHluYXRyYWNlIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiYzdlMDIzYzYtODY3Zi0xMWU4LTlkZjUtNDIwMTBhODAwMWQyIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmR5bmF0cmFjZSJ9.d21HnjUpzAqzWdqLARuaNeFFdBRU1XQwe-iixPBAiGtj_HbsP6g-HCAqsNyzA21MADYBC5GhWlpsW9Cp3QPy0kLdstvagrdGRFRPu89eAN4uvrIeNihITQnUHfOzoLmdMWZNUofMlA3IS7-ZAzvgtWMh5yu3scrIS-jPv_yJEcYGcl2ZpZ9nX-SIPDWJCto0YahBhAnAply-44wkfiYG5_AACrM26yuKFR5lW6aXoZWRMVnFWO43tjOvnYrLB1BY6y_lW9eTIYfbbBO5uGtfefjimeX-hyG6iTtmXWoUIG4Q0xP8dRUxeg2tvFwhgP4tYupRH8YUc7Z1_Q4FTwHORw"
 #        json_config = json.load(open("plugin.json"))
 #        plugin = RemoteKubernetesPlugin()
 #        plugin.initialize(config={"id": id, "url": url, "token": token, "debug": "true", "sandbox": "true"}, json_config=json_config)
