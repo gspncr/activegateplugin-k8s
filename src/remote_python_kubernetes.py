@@ -467,16 +467,18 @@ class RemoteKubernetesPlugin(RemoteBasePlugin):
                     element.report_property('node_info_operating_system', node['node_info_operating_system'])
                     element.report_property('node_info_architecture', node['node_info_architecture'])
 
-                for pod in data["pods"]:
-                    reported_element_metrics = []
+                if data["pods"] is not None:
+                    for pod in data["pods"]:
+                        reported_element_metrics = []
 
-                    for metric in pod['pod_metrics']:
-                        if self.is_reportable(data, metric, node['node_name'], pod['pod_name']):
-                            self.report_topology_metric(element, metric)
-                            reported_element_metrics.append(metric)
-                            reported_group_metrics.append(metric)
+                        if pod['pod_metrics'] is not None:
+                            for metric in pod['pod_metrics']:
+                                if self.is_reportable(data, metric, node['node_name'], pod['pod_name']):
+                                    self.report_topology_metric(element, metric)
+                                    reported_element_metrics.append(metric)
+                                    reported_group_metrics.append(metric)
 
-                    self.report_topology_custom_element_metrics(element, reported_element_metrics)
+                            self.report_topology_custom_element_metrics(element, reported_element_metrics)
 
             self.report_topology_custom_group_metrics(group, reported_group_metrics)
         except Exception as exc:
