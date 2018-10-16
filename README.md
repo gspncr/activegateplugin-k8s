@@ -1,7 +1,5 @@
 # Dynatrace Kubernetes ActiveGate Plugin
 
-Maintainer: dominik.sachsenhofer@dynatrace.com ([Twitter](https://twitter.com/sachsenhofer))
-
 This is the home of Dynatrace Kubernetes ActiveGate Plugin. This plugin can be used to monitor a Kubernetes Cluster and import metrics from Prometheus endpoints. __It is released as a Developer Preview. It is intended to provide early-stage insights into new features until the Dynatrace Kubernetes Integration/Dashboard becomes available.__
 
 <br>
